@@ -3,4 +3,4 @@ fastqc /localdisk/data.local/BPSM/Assignment1/fastq/*.fq.gz -o /localdisk/home/s
 
 #get the output of step1
 #step2: assess the numbers and quality of the output of step1
- 
+#prepare the database of the genome before the step2 
