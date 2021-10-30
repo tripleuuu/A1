@@ -21,5 +21,18 @@ echo "Here're results with 'FAIL' or 'WARN':" >> fastqc_summaries.txt
 cat */summary.txt | egrep "FAIL|WARN" >> fastqc_summaries.txt
 
 #step3: align the read pairs to the genome 
+#3.1 set up the index
+mkdir Tb927genome
+cd ./Tb927genome
+bowtie2-build -f "/localdisk/home/s2232496/AY21A1/genome.fasta.gz" Tb927
 
+#3.2 specify the path of files 
+mkdir Tb927read
+cp /localdisk/data.local/BPSM/Assignment1/fastq/*.gz ./Tb927read
+cd Tb927read
 
+#3.3 align
+bowtie2 -x ../Tb927/Tb927 -1 *_1.fq.gz -2 *_2.fq.gz -S output2.sam
+
+#3.4 convert the output2.sam in .bam files
+ 
