@@ -22,17 +22,29 @@ cat */summary.txt | egrep "FAIL|WARN" >> fastqc_summaries.txt
 
 #step3: align the read pairs to the genome 
 #3.1 set up the index
-mkdir Tb927genome
-cd ./Tb927genome
-bowtie2-build -f "/localdisk/home/s2232496/AY21A1/genome.fasta.gz" Tb927
+mkdir Tb927index
+cd ./Tb927index
+bowtie2-build -f "/localdisk/data.local/BPSM/Assignment1/Tbb_genome/Tb927_genome.fasta.gz" Tb927
+cd ..
 
-#3.2 specify the path of files 
-mkdir Tb927read
-cp /localdisk/data.local/BPSM/Assignment1/fastq/*.gz ./Tb927read
-cd Tb927read
+#3.2 align
+bowtie2 -x ./Tb927/Tb927 -1 /localdisk/data.local/BPSM/Assignment1/fastq/*_1.fq.gz -2 /localdisk/data.local/BPSM/Assignment1/fastq/*_2.fq.gz -S output2.sam
 
-#3.3 align
-bowtie2 -x ../Tb927/Tb927 -1 *_1.fq.gz -2 *_2.fq.gz -S output2.sam
+#3.3 convert the output2.sam in .bam files
+samtools view -bS output2.sam > output2.bam 
 
-#3.4 convert the output2.sam in .bam files
- 
+#3.4 sort and index the output2
+samtools sort output2.sam > output2.sorted.bam
+samtools index output2.sorted.bam
+
+#step4: generate counts data as requirement
+#4.1 intersect between output2.sorted.bam and Tbbgenes.bed
+bedtools intersect -a ./fastq/output2.sorted.bam -b /localdisk/data.local/BPSM/Assignment1/Tbbgenes.bed -wa -wb -bed > output3
+
+#find sequences coding genes and genetate the result
+echo "The number of which aligned to the gene-coding regions is  " > the_number 
+cat output3 | grep -w "gene" | wc -l >> the_number
+
+#step5: output results of expression levels per gene (tab-delimited)
+#5.1 convert .bam file to .bed file
+bedtools bamtobed -i ./fastq/output2.sorted.bam > convert
