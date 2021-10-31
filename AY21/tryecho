@@ -1,0 +1,37 @@
+#!/bin/bash
+echo -n "What's the name of your group? (Please use space as delimiter) "
+mkdir interfile
+read
+#1.1.1 give me some information
+for i in $REPLY
+do
+cat ./fastq/100k.fqfiles | grep "$i" > ./interfile/$i.st1
+done
+
+#1.1.2 find the corresponding files
+echo "Which result(s) do you want? ('all' for all group; keyword(s) for certain group(s). Please use space as delimiter) "
+read
+for l in $REPLY
+do
+ if [ "$l" = "all" ]; then
+  echo "Well done!"
+ else     
+ cat *.st1 | grep "$l" | while read line
+  do
+  cut -f 1,4- > ./interfile/$l.st2
+done
+ fi
+done
+
+#Function you want
+echo "What kind of result do you want? (align/mean/all) "
+read
+for m in $REPLY
+ if [ "$m" = "align" ]; then
+ source Align.sh
+ else
+ 
+echo "Done. Cheer!"
+exit 0
+
+
