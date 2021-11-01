@@ -1,0 +1,61 @@
+#!/bin/bash
+echo -n "What's the name of your group? (Please use space as delimiter) "
+mkdir interfile
+read
+#1.1.1 give me some information
+for i in $REPLY
+do
+cat ./fastq/100k.fqfiles | grep "$i" > ./interfile/$i.st1
+done
+
+#1.1.2 find the corresponding files
+echo "Which group(s) do you want? ('all' for all group; keyword(s) for certain group(s), Induced,etc. Please use space as delimiter) "
+read
+for l in $REPLY
+do
+ if [ "$l" = "all" ]; then
+ echo "Please tell me which column(s) the experimental group data is in. (use space as delimiter) "
+ read
+#Here might have error
+  for col in $REPLY
+  do  
+  cat ./interfile/$i.st1 | cut -f $col | uniq | sort > ./interfile/variable$col.st2
+   while read var1
+   do
+   cat ./interfile/$i.st1 | grep "$var1" | cut -f 6 > ./interfile/pair$var.1 
+   cat ./interfile/$i.st1 | grep "$var1" | cut -f 7 > ./interfile/pair$var.2
+   done < ./interfile/variable$col 
+  done
+ else     
+ cat ./interfile/$i.st1 | grep "$l" | cut -f 6 > ./interfile/pair$l.1
+ cat ./interfile/$i.st1 | grep "$l" | cut -f 7 > ./interfile/pair$l.2  
+ fi
+done
+
+#Function you want
+echo "What kind of result do you want? (qc/align/mean/all)('qc' for quality check') "
+read
+for m in $REPLY
+ if [ "$m" = "qc" ]; then
+ do
+ source qc.sh 
+ elif [ "$m" = "align" ]; then
+ do
+ source Align.sh
+ elif [ "$m" = "mean" ]; then
+ do
+ source mean.sh
+ elif [ "$m" = "all" ]; then 
+ do
+ source Align.sh
+ source mean.sh
+ source qc.sh
+ else
+ echo "Sorry. It doesn't have this kind of function yet. Bear with me. "
+ fi
+done
+
+echo "Done. Cheer!"
+exit 0
+
+
